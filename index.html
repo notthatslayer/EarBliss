@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EarBliss</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --accent:#7c3aed;
+    --accent2:#22c55e;
+    --bg1:#0b1020;
+    --bg2:#12182e;
+    --panel:rgba(16,22,40,.72);
+    --panel2:rgba(255,255,255,.06);
+    --border:rgba(255,255,255,.10);
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --shadow:0 20px 50px rgba(0,0,0,.35);
+  }
+
+  html,
+  body {
+    height:100%;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(124,58,237,.28), transparent 25%),
+      radial-gradient(circle at 80% 0%, rgba(34,197,94,.18), transparent 22%),
+      linear-gradient(180deg,var(--bg1),var(--bg2));
+    color:var(--text);
+  }
+
+  * {
+    scroll-behavior:smooth
+  }
+
+  ::-webkit-scrollbar {
+    width:10px;
+    height:10px
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background:rgba(255,255,255,.15);
+    border-radius:999px
+  }
+
+  ::-webkit-scrollbar-track {
+    background:transparent
+  }
+
+  .glass {
+    background:var(--panel);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:1px solid var(--border);
+    box-shadow:var(--shadow)
+  }
+
+  .glass2 {
+    background:var(--panel2);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.08)
+  }
+
+  .no-select {
+    user-select:none
+  }
+
+  .gradient-text {
+    background:linear-gradient(90deg,var(--accent),#22c55e);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent
+  }
+
+  .btn {
+    transition:.2s transform,.2s opacity,.2s background,.2s border,.2s box-shadow
+  }
+
+  .btn:hover {
+    transform:translateY(-1px) scale(1.01)
+  }
+
+  .pulse {
+    animation:pulse 2.1s infinite
+  }
+
+  @keyframes pulse {
+    0%,100% {
+      box-shadow:0 0 0 0 rgba(124,58,237,.25)
+    }
+
+    50% {
+      box-shadow:0 0 0 14px rgba(124,58,237,0)
+    }
+  }
+
+  .eq span {
+    display:inline-block;
+    width:3px;
+    border-radius:999px;
+    background:var(--accent);
+    margin:0 1px;
+    animation:bar 1s infinite ease-in-out
+  }
+
+  .eq span:nth-child(2) {
+    animation-delay:.15s
+  }
+
+  .eq span:nth-child(3) {
+    animation-delay:.3s
+  }
+
+  .eq span:nth-child(4) {
+    animation-delay:.45s
+  }
+
+  @keyframes bar {
+    0%,100% {
+      height:6px;
+      opacity:.5
+    }
+
+    50% {
+      height:18px;
+      opacity:1
+    }
+  }
+
+  .spin {
+    animation:spin 12s linear infinite
+  }
+
+  .playing .spin {
+    animation-play-state:running
+  }
+
+  .paused .spin {
+    animation-play-state:paused
+  }
+
+  @keyframes spin {
+    to {
+      transform:rotate(360deg)
+    }
+  }
+
+  .fade-in {
+    animation:fade .25s ease-out
+  }
+
+  @keyframes fade {
+    from {
+      opacity:0;
+      transform:translateY(8px)
+    }
+
+    to {
+      opacity:1;
+      transform:translateY(0)
+    }
+  }
+
+  .slide-up {
+    animation:slide .2s ease-out
+  }
+
+  @keyframes slide {
+    from {
+      opacity:0;
+      transform:translateY(14px)
+    }
+
+    to {
+      opacity:1;
+      transform:translateY(0)
+    }
+  }
+
+  .range::-webkit-slider-thumb {
+    -webkit-appearance:none;
+    appearance:none;
+    width:16px;
+    height:16px;
+    border-radius:999px;
+    background:var(--accent);
+    box-shadow:0 0 0 4px rgba(255,255,255,.12)
+  }
+
+  .range::-moz-range-thumb {
+    width:16px;
+    height:16px;
+    border:none;
+    border-radius:999px;
+    background:var(--accent)
+  }
+
+  .truncate-2 {
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden
+  }
+
+  .overlay {
+    background:linear-gradient(180deg, rgba(10,15,30,0), rgba(10,15,30,.86))
+  }
+
+  .kbd {
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.06);
+    padding:.15rem .45rem;
+    border-radius:.5rem;
+    font-size:.72rem
+  }
+</style>
+</head>
+<body class="overflow-hidden">
+  <div id="app" class="h-screen w-screen flex flex-col">
+    <div class="flex flex-1 min-h-0">
+      <aside class="w-80 hidden xl:flex flex-col p-4 gap-4">
+        <div class="glass rounded-3xl p-5 flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black text-xl" id="logoMark">☆</div>
+          <div>
+            <div class="text-lg font-bold">EarBliss</div>
+            <div class="text-xs text-slate-400">Your Gateway to Musical Bliss</div>
+          </div>
+        </div>
+
+        <div class="glass rounded-3xl p-4 flex-1 min-h-0 flex flex-col gap-3">
+          <div class="space-y-2">
+            <button class="navBtn w-full flex items-center gap-3 px-4 py-3 rounded-2xl glass2 btn" data-page="home"><span>⌂</span><span>Home</span></button>
+            <button class="navBtn w-full flex items-center gap-3 px-4 py-3 rounded-2xl glass2 btn" data-page="search"><span>⌕</span><span>Search</span></button>
+            <button class="navBtn w-full flex items-center gap-3 px-4 py-3 rounded-2xl glass2 btn" data-page="library"><span>♫</span><span>Your Library</span></button>
+            <button class="navBtn w-full flex items-center gap-3 px-4 py-3 rounded-2xl glass2 btn" data-page="playlists"><span>ᯤ</span><span>Playlists</span></button>
+            <button class="navBtn w-full flex items-center gap-3 px-4 py-3 rounded-2xl glass2 btn" data-page="settings"><span>⚙︎</span><span>Settings</span></button>
+            <button id="createPlaylistBtn" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl btn text-white font-semibold" style="background:linear-gradient(90deg,var(--accent),#22c55e);"><span>＋</span><span>Create Playlist</span></button>
+          </div>
+
+          <div class="mt-2 flex items-center justify-between">
+            <div class="text-sm font-semibold">Your Playlists</div>
+            <div class="text-xs text-slate-400" id="playlistCount"></div>
+          </div>
+          <div id="playlistList" class="overflow-auto pr-1 space-y-2 flex-1"></div>
+        </div>
+      </aside>
+
+      <main class="flex-1 min-w-0 flex flex-col p-4 gap-4">
+        <header class="glass rounded-3xl px-5 py-4 flex items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl md:text-3xl font-black"><span class="gradient-text">EarBliss</span></h1>
+                        <div class="text-xs uppercase tracking-[.3em] text-slate-400">Artwork & Music © Respective Owners - Project by Tayyaba</div>
+          </div>
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="hidden md:flex items-center gap-2 glass2 rounded-2xl px-4 py-2 min-w-[340px]">
+              <span>⌘</span>
+              <input id="globalSearch" class="bg-transparent outline-none w-full text-sm" placeholder="Search songs, artists, albums..." />
+            </div>
+            <button id="openQueueBtn" class="glass2 rounded-2xl px-4 py-2 btn">Queue</button>
+            <button id="openMiniBtn" class="glass2 rounded-2xl px-4 py-2 btn">Mini Player</button>
+          </div>
+        </header>
+
+        <section id="page" class="flex-1 min-h-0 overflow-auto rounded-[2rem] glass p-4 md:p-6 fade-in"></section>
+      </main>
+    </div>
+
+    <footer class="glass rounded-t-[2rem] px-4 py-3 md:px-5 md:py-4 flex items-center gap-4">
+      <div class="flex items-center gap-3 w-[32%] min-w-0">
+        <img id="playerCover" class="w-16 h-16 rounded-2xl object-cover shadow-lg spin" src="" alt="cover" />
+        <div class="min-w-0">
+          <div id="playerTitle" class="font-semibold truncate">Nothing playing</div>
+          <div id="playerArtist" class="text-sm text-slate-400 truncate">Pick a song to start</div>
+        </div>
+        <button id="likeBtn" class="ml-2 glass2 rounded-xl px-3 py-2 btn">♡</button>
+      </div>
+
+      <div class="flex-1 min-w-0 flex flex-col gap-2 items-center">
+        <div class="flex items-center gap-3">
+          <button id="shuffleBtn" class="glass2 rounded-xl px-3 py-2 btn">⤮</button>
+          <button id="prevBtn" class="glass2 rounded-xl px-3 py-2 btn">◁</button>
+          <button id="playBtn" class="w-12 h-12 rounded-full btn text-white font-bold" style="background:linear-gradient(90deg,var(--accent),#22c55e)">▶</button>
+          <button id="nextBtn" class="glass2 rounded-xl px-3 py-2 btn">▷</button>
+          <button id="repeatBtn" class="glass2 rounded-xl px-3 py-2 btn">↻</button>
+          <select id="speedSel" class="glass2 rounded-xl px-3 py-2 outline-none text-sm">
+            <option>0.75x</option><option selected>1x</option><option>1.25x</option><option>1.5x</option><option>2x</option>
+          </select>
+        </div>
+        <div class="w-full flex items-center gap-3 text-xs text-slate-400">
+          <div id="currentTime" class="w-10 text-right">0:00</div>
+          <input id="progress" class="range w-full h-2 rounded-full appearance-none bg-white/10" type="range" min="0" max="1000" value="0" />
+          <div id="totalTime" class="w-10">0:00</div>
+        </div>
+      </div>
+
+      <div class="w-[32%] min-w-0 flex items-center justify-end gap-3">
+        <div class="hidden lg:flex items-center gap-3 glass2 rounded-2xl px-3 py-2">
+          <span>🔊</span>
+          <input id="volume" class="range w-32 h-2 appearance-none bg-white/10 rounded-full" type="range" min="0" max="1" step="0.01" />
+          <button id="muteBtn" class="btn">🔈</button>
+        </div>
+        <div class="eq h-5 flex items-end" title="Audio active"><span></span><span></span><span></span><span></span></div>
+      </div>
+    </footer>
+  </div>
+
+  <div id="miniPlayer" class="fixed bottom-24 right-6 z-40 glass rounded-3xl p-3 w-80 hidden slide-up">
+    <div class="flex items-center gap-3">
+      <img id="miniCover" class="w-16 h-16 rounded-2xl object-cover spin" src="" />
+      <div class="min-w-0 flex-1">
+        <div id="miniTitle" class="font-semibold truncate"></div>
+        <div id="miniArtist" class="text-sm text-slate-400 truncate"></div>
+        <div class="mt-2 flex items-center gap-2">
+          <button id="miniPlay" class="glass2 rounded-xl px-3 py-2 btn">Play</button>
+          <button id="miniOpen" class="glass2 rounded-xl px-3 py-2 btn">Open</button>
+          <button id="miniClose" class="glass2 rounded-xl px-3 py-2 btn">✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="drawer" class="fixed inset-0 z-50 hidden">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div id="drawerPanel" class="absolute right-0 top-0 h-full w-full md:w-[420px] glass p-5 overflow-auto"></div>
+  </div>
+
+  <div id="toastWrap" class="fixed top-4 right-4 z-[60] space-y-3"></div>
+
+  <audio id="audio"></audio>
+
+  <script>
+    const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+    const uid = () => Math.random().toString(36).slice(2, 10);
+    const fmt = t => isFinite(t) ? `${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}` : '0:00';
+    const store = { get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}, set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)) };
+
+    const assets = [
+      {
+    t:'Make You Mine',
+    a:'PUBLIC',
+    al:'Make You Mine - Single',
+    g:'Pop / Indie Pop / Pop Rock',
+    y:2019,d:196,
+    c:'https://i.scdn.co/image/ab67616d0000b2730d0621554b1c6c9dbf3556be',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'End of Beginning',
+    a:'Djo',
+    al:'Decide',
+    g:'Neo-Psychedelia, Indie Pop',
+    y:2022,d:143,
+    c:'https://th.bing.com/th/id/OIP.4JdjtE9DMyJ3AvKN49R7HgAAAA?w=208&h=208&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'Treat You Better',
+    a:'Shawn Mendes',
+    al:'Illuminate',
+    g:'Pop',
+    y:2016,d:187,
+    c:'https://www.udiscovermusic.com/wp-content/uploads/2024/08/shawn-mendes-treat-1.jpg',
+    u:''
+},
+{
+    t:'double take',
+    a:'dhruv',
+    al:'rapunzel',
+    g:'R&B, Bedroom Pop',
+    y:2019,d:171,
+    c:'https://th.bing.com/th/id/OIP.sMJFK9fOA8YZNXYihTuWXwHaHa?w=208&h=208&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
+    u:''
+},
+{
+    t:'Somewhere Only We Know',
+    a:'Keane',
+    al:'Hopes and Fears',
+    g:'Alternative Rock, Piano Rock',
+    y:2004,d:237,
+    c:'https://assets.crownnote.com/s3fs-public/Keane-Somewhere_Only_We_Know_(CD_Single)-Frontal.jpg',
+    u:''
+},
+{
+    t:'Sailor Song',
+    a:'Gigi Perez',
+    al:'At the Beach, in Every Life',
+    g:'Indie folk, Alternative/Indie',
+    y:2024,d:212,
+    c:'https://i1.sndcdn.com/artworks-n24Uj0dAWOZB-0-t500x500.jpg',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'Teenage Dream',
+    a:'Stephen Dawes',
+    al:'Teenage Dream',
+    g:'Indie Pop',
+    y:2020,d:193,
+    c:'https://i.scdn.co/image/ab67616d0000b2735b78576b125a419c30e01dc3',
+    u:''
+},
+{
+    t:'Little Moth',
+    a:'Chloe Moriondo',
+    al:'Rabbit Hearted',
+    g:'Pop',
+    y:2018,d:148,
+    c:'https://images.genius.com/48c3cd0fbf635d4fb899aef2702f6d05.1000x1000x1.jpg',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'Strawberries & Cigarettes',
+    a:'Troye Sivan',
+    al:'Love, Simon (Original Motion Picture Soundtrack)',
+    g:'Pop',
+    y:2018,d:202,
+    c:'https://www.bing.com/th/id/OIP.99eXtYA19QKhqJFmddSX1gHaHa?w=193&h=193&c=8&rs=1&qlt=90&r=0&o=6&dpr=1.3&pid=ImgAns&rm=2',
+    u:''
+},
+{
+    t:'My Love Mine All Mine',
+    a:'Mitski',
+    al:'The Land Is Inhospitable and So Are We',
+    g:'Indie Folk, Indie Rock',
+    y:2023,d:137,
+    c:'https://topmusicarts.com/cdn/shop/files/Mitski---My-Love-Mine-All-Mine-TMA_1024x1024@2x.png?v=1706227273',
+    u:''
+},
+{
+    t:'Apocalypse',
+    a:'Cigarettes After Sex',
+    al:'Cigarettes After Sex',
+    g:'Dream Pop / Indie',
+    y:2017,d:290,
+    c:'https://tse2.mm.bing.net/th/id/OIP.kjI8ea8Ek7WA3OKDhdM3dQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'K',
+    a:'Cigarettes After Sex',
+    al:'Cigarettes After Sex',
+    g:'Dream Pop / Ambient Pop / Slowcore',
+    y:2016,d:320,
+    c:'https://tse2.mm.bing.net/th/id/OIP.kjI8ea8Ek7WA3OKDhdM3dQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'Mojo Pin',
+    a:'Jeff Buckley',
+    al:'Grace',
+    g:'Alternative Rock, Folk Rock',
+    y:1994,d:342,
+    c:'https://upload.wikimedia.org/wikipedia/en/thumb/e/e4/Jeff_Buckley_grace.jpg/250px-Jeff_Buckley_grace.jpg',
+    u:''
+},
+{
+    t:'Hallelujah',
+    a:'Jeff Buckley',
+    al:'Grace',
+    g:'Alternative Rock / Folk Rock',
+    y:1994,d:394,
+    c:'https://upload.wikimedia.org/wikipedia/en/thumb/e/e4/Jeff_Buckley_grace.jpg/250px-Jeff_Buckley_grace.jpg',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'Memories',
+    a:'Conan Gray',
+    al:'Superache',
+    g:'Pop / Pop-ballad',
+    y:2022,d:249,
+    c:'https://upload.wikimedia.org/wikipedia/en/5/5d/Conan_Gray_-_Superache.png',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'Back to Friends',
+    a:'Sombr',
+    al:'I Barely Know Her',
+    g:'Alternative / Indie Rock',
+    y:2024,d:191,
+    c:'https://uproxx.com/wp-content/uploads/2025/08/I-Barely-Know-Her_Cover-Large.jpeg',
+    u:'songlinkhere.mp3'
+},
+{
+    t:'Do I Ever Cross Your Mind',
+    a:'Sombr',
+    al:'Do I Ever Cross Your Mind',
+    g:'Indie Rock',
+    y:2024,d:149,
+    c:'https://i.scdn.co/image/ab67616d0000b27386ce0a577481711ca8d5f5b9',
+    u:'songlinkhere.mp3'
+},
+{
+    t:"would've been you",
+    a:'Sombr',
+    al:"would've been you - Single",
+    g:'Alternative Rock, Indie Rock',
+    y:2023,d:184,
+    c:'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/56/3e/55/563e55e3-e941-e235-343a-54d08ff2afa6/054391351494.jpg/1200x1200bf-60.jpg',
+    u:''
+},
+{
+    t:'Fingers Crossed',
+    a:'Elijah Woods',
+    al:'Elijah Would!',
+    g:'Pop',
+    y:2023,d:174,
+    c:'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/21/fe/1f/21fe1f9c-603a-b38a-037c-6e7cc32dde03/artwork.jpg/1200x1200bf-60.jpg',
+    u:''
+},
+{
+    t:'everything sucks',
+    a:'vaultboy',
+    al:'everything sucks.',
+    g:'Indie Pop',
+    y:2021,d:121,
+    c:'https://tse4.mm.bing.net/th/id/OIP.fs-wR0_f6Dy9w86R5YBB3AHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
+    u:''
+},
+{
+    t:'Rare',
+    a:'Selena Gomez',
+    al:'Rare',
+    g:'Pop',
+    y:2020,d:220,
+    c:'https://www.udiscovermusic.com/wp-content/uploads/2019/12/Selena-Gomez-Rare-album-cover-820.jpg',
+    u:''
+},
+{
+    t:'How Does It Feel To Be Forgotten',
+    a:'Selena Gomez',
+    al:'I Said I Love You First',
+    g:'Pop',
+    y:2025,d:161,
+    c:'https://tse4.mm.bing.net/th/id/OIP.y-knzxMpti8u7FkMZv8DLwHaHZ?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
+    u:''
+},
+{
+    t:'Seasons',
+    a:'Rival, Cadmium',
+    al:'Seasons',
+    g:'Electronic, Future Bass',
+    y:2020,d:206,
+    c:'https://akamai.sscdn.co/uploadfile/letras/albuns/3/0/f/5/1834621687524808.jpg',
+    u:''
+},
+{
+    t:'Centuries',
+    a:'Fall Out Boy',
+    al:'American Beauty/American Psycho',
+    g:'Pop Rock, Alternative Rock',
+    y:2014,d:228,
+    c:'https://i1.sndcdn.com/artworks-000162611261-w09pet-t1080x1080.jpg',
+    u:''
+},
+{
+    t:"Wolf in Sheep's Clothing",
+    a:'Set It Off',
+    al:'Duality',
+    g:'Orchestral Pop Punk / Alternative Rock',
+    y:2014,d:191,
+    c:'https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/5ef5a684624061.5d634c985a011.png',
+    u:'songlinkhere.mp3'
+}
+].map((s,i)=>({
+  id:`s${i+1}`,
+  title:s.t,
+  artist:s.a,
+  album:s.al,
+  albumId:s.al.toLowerCase().replace(/\s+/g,'-')+'-'+i,
+  genre:s.g,
+  year:s.y,
+  duration:s.d,
+  cover:s.c,
+  audioUrl:s.u,
+  playCount:Math.floor(Math.random()*30)+5
+}));
+
+const state = store.get('vt_state', {
+  page:'home',
+  currentId: assets[0].id,
+  isPlaying:false,
+  progress:0,
+  volume:.85,
+  muted:false,
+  speed:1,
+  shuffle:false,
+  repeat:'all',
+  search:'',
+  recentSearches:[],
+  liked:[],
+  queue:[],
+  recentlyPlayed:[],
+  settings:{
+    accent:'#7c3aed',
+    autoplay:true,
+    crossfade:0,
+    quality:'high',
+    defaultVolume:.85,
+    theme:'dark'
+  },
+  playlists:[
+    {
+      id:'liked',
+      name:'Liked Songs',
+      cover:assets[0].cover,
+      description:'Your saved tracks',
+      songs:[]
+    }
+  ]
+});
+
+const audio = $('#audio');
+
+const albumMap = Object.fromEntries(
+  assets.map(s=>[
+    s.albumId,
+    {
+      id:s.albumId,
+      name:s.album,
+      artist:s.artist,
+      cover:s.cover,
+      year:s.year,
+      songs:[]
+    }
+  ])
+);
+
+assets.forEach(s=>albumMap[s.albumId].songs.push(s.id));
+
+const artistMap = {};
+
+assets.forEach(s=>{
+  (artistMap[s.artist]??={
+    name:s.artist,
+    cover:s.cover,
+    bio:`${s.artist} creates immersive tracks across ${s.genre.toLowerCase()} and pop-inflected soundscapes.`,
+    songs:[],
+    albums:new Set()
+  }).songs.push(s.id);
+
+  artistMap[s.artist].albums.add(s.albumId);
+});
+
+Object.values(artistMap).forEach(a=>a.albums=[...a.albums]);
+
+    function toast(msg){const el=document.createElement('div');el.className='glass rounded-2xl px-4 py-3 text-sm fade-in';el.textContent=msg;$('#toastWrap').appendChild(el);setTimeout(()=>el.remove(),2200)}
+    function save()
+    {
+      store.set('vt_state',state); 
+      renderSidebar(); 
+      renderPlayer(); 
+      }
+    function setAccent(c)
+    {
+      document.documentElement.style.setProperty('--accent',c); $('#logoMark').style.background=`linear-gradient(135deg,${c},#22c55e)`; 
+    save()}
+    function currentSong()
+    {
+      return assets.find(s=>s.id===state.currentId)||assets[0]}
+    function addRecent(id){
+      state.recentlyPlayed=[id,...state.recentlyPlayed.filter(x=>x!==id)].slice(0,20)
+    }
+    function playSong(id, autoplay=true){const s=assets.find(x=>x.id===id); 
+    if(!s) return; state.currentId=id; 
+    addRecent(id); s.playCount++; audio.src=s.audioUrl; audio.playbackRate=state.speed; audio.volume=state.muted?0:state.volume; 
+    if(autoplay){audio.play().then(()=>state.isPlaying=true).catch(()=>toast('Playback blocked until interaction'));
+    } 
+    render(); 
+    save(); 
+    }
+    function nextSong(){const list = state.shuffle ? [...assets].sort(()=>Math.random()-.5) : assets; 
+    let i=list.findIndex(s=>s.id===state.currentId); 
+    if(state.repeat==='one')
+    {
+      playSong(state.currentId); return;
+      } 
+      if(i<list.length-1) playSong(list[i+1].id); 
+      else if(state.repeat==='all') playSong(list[0].id); 
+      else {
+      audio.pause(); state.isPlaying=false; 
+      save();
+    }
+    }
+    function prevSong()
+    {
+      audio.currentTime>3 ? audio.currentTime=0 : playSong(assets[(assets.findIndex(s=>s.id===state.currentId)-1+assets.length)%assets.length].id);
+      }
+    function renderSidebar()
+    { 
+      $('#playlistCount').textContent=`${state.playlists.length} lists`; 
+      $('#playlistList').innerHTML = state.playlists.map(pl=>`<button class="w-full text-left glass2 rounded-2xl p-3 btn playlistOpen" data-id="${pl.id}"><div class="flex items-center gap-3">
+      <img class="w-12 h-12 rounded-xl object-cover" src="${pl.cover}">
+      <div class="min-w-0"><div class="font-semibold truncate">${pl.name}</div><div class="text-xs text-slate-400">${pl.songs.length} songs</div></div></div></button>`).join(''); $$('.playlistOpen').forEach(b=>b.onclick=()=>openPlaylist(b.dataset.id)); }
+    function renderPlayer(){ const s=currentSong(); $('#playerCover').src=s.cover; $('#playerTitle').textContent=s.title; $('#playerArtist').textContent=s.artist; $('#miniCover').src=s.cover; $('#miniTitle').textContent=s.title; $('#miniArtist').textContent=s.artist; $('#playBtn').textContent=state.isPlaying?'❚❚':'▶'; $('#miniPlay').textContent=state.isPlaying?'Pause':'Play'; $('#likeBtn').textContent=state.liked.includes(s.id)?'♥':'♡'; $('#volume').value=state.muted?0:state.volume; $('#progress').value = (audio.duration?audio.currentTime/audio.duration:0)*1000||0; $('#currentTime').textContent=fmt(audio.currentTime); $('#totalTime').textContent=fmt(audio.duration); $('#repeatBtn').style.outline = state.repeat!=='all' ? `2px solid var(--accent)` : 'none'; }
+    function renderHome()
+    { 
+      const order=[...new Set(state.recentlyPlayed)].map(id=>assets.find(s=>s.id===id)).filter(Boolean); 
+      const trending=[...assets].sort((a,b)=>b.playCount-a.playCount).slice(0,6); 
+      const artists=[...new Set(assets.map(s=>s.artist))].map(n=>artistMap[n]); $('#page').innerHTML = `<div class="space-y-8">
+      <div class="flex items-end justify-between gap-4">
+      <div>
+      <div class="text-sm text-slate-400">Welcome back</div>
+      <h2 class="text-3xl font-black">Made for <span class="gradient-text">your vibe</span></h2>
+      </div>
+      <div class="text-xs text-slate-400">Shortcuts: <span class="kbd">Space</span> <span class="kbd">N</span> <span class="kbd">P</span></div>
+      </div>
+      <section>
+      <div class="flex justify-between mb-3">
+      <h3 class="font-bold text-xl">Recently Played</h3>
+      </div>
+      <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">${(order.length?order:assets.slice(0,4)).map(card).join('')}
+      </div>
+      </section>
+      <section>
+      <h3 class="font-bold text-xl mb-3">Trending</h3>
+      <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${trending.map(card).join('')}
+      </div>
+      </section>
+      <section>
+      <h3 class="font-bold text-xl mb-3">Popular Artists</h3><div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">${artists.map(a=>artistCard(a)).join('')}</div></section>
+    </div>`; 
+    bindCards(); 
+    }
+    function card(s)
+    { 
+      return `<div class="song-card glass2 rounded-3xl overflow-hidden cursor-pointer btn" data-id="${s.id}"><div class="relative">
+      <img src="${s.cover}" class="w-full aspect-square object-cover">
+      <div class="absolute inset-0 overlay opacity-0 hover:opacity-100 transition flex items-end p-4">
+      <button class="playOne rounded-full w-12 h-12 text-white font-black" style="background:linear-gradient(90deg,var(--accent),#22c55e)" data-id="${s.id}">▶</button>
+      </div>
+      </div>
+      <div class="p-4">
+      <div class="font-semibold truncate">${s.title}</div><div class="text-sm text-slate-400 truncate">${s.artist}</div></div></div>`}
+    function artistCard(a){ return `<button class="glass2 rounded-3xl p-4 text-left btn" data-artist="${a.name}"><img src="${a.cover}" class="w-full aspect-square object-cover rounded-2xl mb-3"><div class="font-semibold">${a.name}</div><div class="text-sm text-slate-400">${a.songs.length} songs</div></button>`}
+    function openPlaylist(id){ const pl=state.playlists.find(p=>p.id===id); if(!pl) return; const songs=pl.songs.map(sid=>assets.find(s=>s.id===sid)).filter(Boolean); $('#page').innerHTML=`<div class="space-y-5 fade-in"><div class="flex flex-col md:flex-row gap-5 items-end"><img src="${pl.cover}" class="w-48 h-48 rounded-3xl object-cover shadow-2xl"><div class="flex-1"><div class="text-sm text-slate-400">Playlist</div><h2 class="text-4xl font-black">${pl.name}</h2><p class="text-slate-300 mt-2 max-w-2xl">${pl.description||''}</p><div class="mt-4 flex gap-3"><button class="glass2 rounded-2xl px-4 py-2 btn" onclick="window.app.playPlaylist('${id}')">Play</button><button class="glass2 rounded-2xl px-4 py-2 btn" onclick="window.app.shufflePlaylist('${id}')">Shuffle</button><button class="glass2 rounded-2xl px-4 py-2 btn" onclick="window.app.editPlaylist('${id}')">Edit</button></div></div></div><div class="grid gap-3">${songs.map((s,i)=>row(s,pl.id,i)).join('')||'<div class="text-slate-400">No songs yet.</div>'}</div></div>`; bindCards(); }
+    function row(s,pid,i){ return `<div class="glass2 rounded-2xl p-3 flex items-center gap-3"><div class="text-slate-500 w-6">${i+1}</div><img src="${s.cover}" class="w-14 h-14 rounded-xl object-cover"><div class="min-w-0 flex-1"><div class="font-semibold truncate">${s.title}</div><div class="text-sm text-slate-400 truncate">${s.artist} • ${s.album}</div></div><button class="glass2 rounded-xl px-3 py-2 btn" onclick="window.app.playSong('${s.id}')">Play</button><button class="glass2 rounded-xl px-3 py-2 btn" onclick="window.app.removeFromPlaylist('${pid}','${s.id}')">Remove</button></div>`}
+    function render(){ renderSidebar(); renderPlayer(); if(state.page==='home') renderHome(); else if(state.page==='search') renderSearch(); else if(state.page==='library') renderLibrary(); else if(state.page==='playlists') renderPlaylists(); else if(state.page==='settings') renderSettings(); else if(state.page.startsWith('artist:')) renderArtist(state.page.split(':')[1]); else if(state.page.startsWith('album:')) renderAlbum(state.page.split(':')[1]); else if(state.page.startsWith('playlist:')) openPlaylist(state.page.split(':')[1]); }
+    function bindCards(){ $$('.song-card,[data-artist],.playOne').forEach(el=>el.onclick=e=>{e.stopPropagation(); const id=el.dataset.id||el.closest('[data-id]')?.dataset.id; if(el.dataset.artist) renderArtist(el.dataset.artist); else if(id) playSong(id);}); $$('.song-card').forEach(el=>el.oncontextmenu=e=>{e.preventDefault(); openContextMenu(el.dataset.id,e.clientX,e.clientY)}); }
+    function renderSearch(){ const q=(state.search||'').toLowerCase(); const results=assets.filter(s=>[s.title,s.artist,s.album,s.genre].join(' ').toLowerCase().includes(q)); $('#page').innerHTML=`<div class="space-y-5"><div class="flex items-center gap-3"><input id="searchInput" value="${state.search||''}" class="glass2 rounded-2xl px-4 py-3 w-full outline-none" placeholder="Search songs, artists, albums, genres, playlists..." /></div><div class="flex flex-wrap gap-2">${state.recentSearches.slice(0,6).map(x=>`<button class="glass2 rounded-full px-3 py-2 btn recentQ">${x}</button>`).join('')}</div><div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${results.map(s=>card(s)).join('')||'<div class="text-slate-400">No matches found.</div>'}</div></div>`; $('#searchInput').oninput=e=>{state.search=e.target.value; if(state.search.trim()) state.recentSearches=[state.search,...state.recentSearches.filter(x=>x!==state.search)].slice(0,8); render(); save()}; $$('.recentQ').forEach(b=>b.onclick=()=>{state.search=b.textContent; render(); save()}); bindCards(); }
+    function renderLibrary(){ const liked=assets.filter(s=>state.liked.includes(s.id)); $('#page').innerHTML=`<div class="space-y-5"><h2 class="text-3xl font-black">Your Library</h2><div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">${liked.map(card).join('')||'<div class="text-slate-400">Like songs to build your library.</div>'}</div></div>`; bindCards(); }
+    function renderPlaylists(){ $('#page').innerHTML=`<div class="space-y-5"><div class="flex items-center justify-between"><h2 class="text-3xl font-black">Playlists</h2></div><div class="grid md:grid-cols-2 xl:grid-cols-3 gap-4">${state.playlists.map(pl=>`<button class="glass2 rounded-3xl p-4 text-left btn" onclick="window.app.openPlaylist('${pl.id}')"><img src="${pl.cover}" class="w-full aspect-square object-cover rounded-2xl mb-3"><div class="font-semibold truncate">${pl.name}</div><div class="text-sm text-slate-400">${pl.songs.length} songs</div></button>`).join('')}</div></div>`; }
+    function renderArtist(name){ const a=artistMap[name]; $('#page').innerHTML=`<div class="space-y-5"><div class="flex flex-col md:flex-row gap-5 items-end"><img src="${a.cover}" class="w-48 h-48 rounded-3xl object-cover"><div><div class="text-sm text-slate-400">Artist</div><h2 class="text-4xl font-black">${a.name}</h2><p class="text-slate-300 max-w-2xl mt-2">${a.bio}</p><button class="glass2 rounded-2xl px-4 py-2 btn mt-4" onclick="window.app.playSong('${a.songs[0]}')">Play Top Song</button></div></div><div><h3 class="text-xl font-bold mb-3">Popular Songs</h3><div class="grid gap-3">${a.songs.map(id=>row(assets.find(s=>s.id===id),'',0)).join('')}</div></div></div>`; bindCards(); }
+    function renderAlbum(id){ const a=albumMap[id]; $('#page').innerHTML=`<div class="space-y-5"><div class="flex flex-col md:flex-row gap-5 items-end"><img src="${a.cover}" class="w-48 h-48 rounded-3xl object-cover"><div><div class="text-sm text-slate-400">Album</div><h2 class="text-4xl font-black">${a.name}</h2><p class="text-slate-300 mt-2">${a.artist} • ${a.year}</p><button class="glass2 rounded-2xl px-4 py-2 btn mt-4" onclick="window.app.playSong('${a.songs[0]}')">Play Album</button></div></div><div class="grid gap-3">${a.songs.map((sid,i)=>row(assets.find(s=>s.id===sid),'',i)).join('')}</div></div>`; bindCards(); }
+    function renderSettings(){ $('#page').innerHTML=`<div class="space-y-6 max-w-3xl"><h2 class="text-3xl font-black">Settings</h2>
+      <div class="grid md:grid-cols-2 gap-4"><div class="glass2 rounded-3xl p-5"><div class="font-semibold mb-3">Appearance</div><label class="text-sm text-slate-400">Accent Color</label><input id="accent" type="color" value="${state.settings.accent}" class="w-full h-12 bg-transparent mt-2"></div>
+      <div class="glass2 rounded-3xl p-5"><div class="font-semibold mb-3">Playback</div><label class="text-sm text-slate-400">Default Volume</label><input id="defVol" type="range" min="0" max="1" step="0.01" value="${state.settings.defaultVolume}" class="range w-full mt-2"></div></div>
+      <div class="glass2 rounded-3xl p-5 grid md:grid-cols-2 gap-4"><label class="flex items-center justify-between">Autoplay <input id="autoplay" type="checkbox" ${state.settings.autoplay?'checked':''}></label><label class="flex items-center justify-between">Dark Mode <input checked disabled type="checkbox"></label><label class="flex items-center justify-between">Crossfade <input id="crossfade" type="range" min="0" max="10" value="${state.settings.crossfade}" class="range w-40"></label><label class="flex items-center justify-between">Quality <select id="quality" class="glass2 rounded-xl px-3 py-2"><option ${state.settings.quality==='low'?'selected':''}>low</option><option ${state.settings.quality==='high'?'selected':''}>high</option></select></label></div>
+      <button id="saveSettings" class="rounded-2xl px-4 py-3 text-white font-semibold btn" style="background:linear-gradient(90deg,var(--accent),#22c55e)">Save Settings</button>
+    </div>`; $('#accent').oninput=e=>setAccent(e.target.value); $('#defVol').oninput=e=>{state.settings.defaultVolume=+e.target.value; audio.volume=state.settings.defaultVolume; save()}; $('#saveSettings').onclick=()=>{state.settings.autoplay=$('#autoplay').checked; state.settings.crossfade=+$('#crossfade').value; state.settings.quality=$('#quality').value; toast('Settings saved'); save()}; }
+    function openContextMenu(id,x,y){ const s=assets.find(a=>a.id===id); $('#drawer').classList.remove('hidden'); $('#drawerPanel').innerHTML=`<div class="flex items-center justify-between mb-4"><div><div class="text-sm text-slate-400">Song actions</div><div class="text-xl font-bold">${s.title}</div></div><button class="glass2 rounded-xl px-3 py-2 btn" onclick="closeDrawer()">✕</button></div>
+      <div class="grid gap-2">${[['Play',`playSong('${id}')`],['Play next',`queueNext('${id}')`],['Add to queue',`addToQueue('${id}')`],['Like/Unlike',`toggleLike('${id}')`],['Go to artist',`gotoArtist('${s.artist}')`],['Go to album',`gotoAlbum('${s.albumId}')`]].map(([n,a])=>`<button class="glass2 rounded-2xl px-4 py-3 text-left btn" onclick="window.app.${a};closeDrawer()">${n}</button>`).join('')}</div>`; }
+    function closeDrawer(){ $('#drawer').classList.add('hidden') }
+    function addToQueue(id){ state.queue.push(id); toast('Added to queue'); save(); }
+    function queueNext(id){ state.queue.unshift(id); toast('Will play next'); save(); }
+    function toggleLike(id){ state.liked.includes(id)?state.liked=state.liked.filter(x=>x!==id):state.liked.push(id); let pl=state.playlists.find(p=>p.id==='liked'); pl.songs=[...new Set(state.liked)]; toast(state.liked.includes(id)?'Liked':'Unliked'); save(); render(); }
+    function makePlaylist(){ const name=prompt('Playlist name?'); if(!name) return; const desc=prompt('Description?')||''; const cover=prompt('Cover image URL? Use any image URL or leave blank for auto cover.','')||assets[Math.floor(Math.random()*assets.length)].cover; state.playlists.push({id:uid(),name,description:desc,cover,songs:[]}); toast('Playlist created'); save(); render(); }
+    function playPlaylist(id){ const pl=state.playlists.find(p=>p.id===id); if(!pl?.songs.length) return toast('Playlist is empty'); playSong(pl.songs[0]); state.queue=[...pl.songs.slice(1)]; }
+    function shufflePlaylist(id){ const pl=state.playlists.find(p=>p.id===id); if(!pl?.songs.length) return; state.queue=[...pl.songs].sort(()=>Math.random()-.5); playSong(state.queue.shift(),true); }
+    function removeFromPlaylist(pid,sid){ const pl=state.playlists.find(p=>p.id===pid); pl.songs=pl.songs.filter(x=>x!==sid); toast('Song removed'); save(); render(); }
+    window.app={playSong,openPlaylist,playPlaylist,shufflePlaylist,removeFromPlaylist,toggleLike,addToQueue,queueNext,gotoArtist:(n)=>{state.page='artist:'+n; render(); save()},gotoAlbum:(id)=>{state.page='album:'+id; render(); save()},editPlaylist:(id)=>{const pl=state.playlists.find(p=>p.id===id); const n=prompt('Rename playlist',pl.name); if(n){pl.name=n; const d=prompt('Description',pl.description||''); if(d!==null) pl.description=d; toast('Playlist updated'); save(); render();}},removePlaylist:(id)=>{state.playlists=state.playlists.filter(p=>p.id!==id&&p.id!=='liked'); toast('Playlist deleted'); save(); render();}};
+    $('#createPlaylistBtn').onclick=makePlaylist; $('.navBtn')?.forEach?.(()=>{});
+    $$('.navBtn').forEach(b=>b.onclick=()=>{state.page=b.dataset.page; render(); save();});
+    $('#globalSearch').oninput=e=>{state.page='search'; state.search=e.target.value; render(); save();};
+    $('#openQueueBtn').onclick=()=>{ $('#drawer').classList.remove('hidden'); $('#drawerPanel').innerHTML=`<div class="flex items-center justify-between mb-4"><div><div class="text-sm text-slate-400">Queue</div><div class="text-xl font-bold">${state.queue.length} tracks</div></div><button class="glass2 rounded-xl px-3 py-2 btn" onclick="closeDrawer()">✕</button></div><div class="space-y-2">${state.queue.map((id,i)=>{const s=assets.find(a=>a.id===id);return `<div class="glass2 rounded-2xl p-3 flex items-center gap-3"><div class="text-slate-500 w-6">${i+1}</div><img src="${s.cover}" class="w-12 h-12 rounded-xl object-cover"><div class="min-w-0 flex-1"><div class="font-semibold truncate">${s.title}</div><div class="text-xs text-slate-400 truncate">${s.artist}</div></div><button class="glass2 rounded-xl px-3 py-2 btn" onclick="window.app.playSong('${id}')">Play</button></div>`}).join('')||'<div class="text-slate-400">Queue is empty</div>'}</div>`; };
+    $('#openMiniBtn').onclick=()=>$('#miniPlayer').classList.toggle('hidden'); $('#miniClose').onclick=()=>$('#miniPlayer').classList.add('hidden'); $('#miniOpen').onclick=()=>$('#miniPlayer').classList.add('hidden');
+    $('#miniPlay').onclick=$('#playBtn').onclick=()=>{ if(audio.paused){audio.play(); state.isPlaying=true;} else {audio.pause(); state.isPlaying=false;} save(); renderPlayer(); };
+    $('#nextBtn').onclick=nextSong; $('#prevBtn').onclick=prevSong; $('#shuffleBtn').onclick=()=>{state.shuffle=!state.shuffle; toast(`Shuffle ${state.shuffle?'on':'off'}`); save();}; $('#repeatBtn').onclick=()=>{state.repeat=state.repeat==='all'?'one':state.repeat==='one'?'off':'all'; toast(`Repeat: ${state.repeat}`); save();};
+    $('#likeBtn').onclick=()=>toggleLike(state.currentId); $('#volume').oninput=e=>{state.volume=+e.target.value; audio.volume=state.muted?0:state.volume; save();}; $('#muteBtn').onclick=()=>{state.muted=!state.muted; audio.volume=state.muted?0:state.volume; save();};
+    $('#speedSel').onchange=e=>{state.speed=parseFloat(e.target.value); audio.playbackRate=state.speed; save();}; $('#progress').oninput=e=>{if(audio.duration) audio.currentTime=(e.target.value/1000)*audio.duration;};
+    audio.onloadedmetadata=()=>renderPlayer(); audio.ontimeupdate=()=>{if(audio.duration){$('#progress').value=(audio.currentTime/audio.duration)*1000; $('#currentTime').textContent=fmt(audio.currentTime); $('#totalTime').textContent=fmt(audio.duration)}};
+    audio.onended=()=>{state.currentId = state.queue.length ? state.queue.shift() : (state.repeat==='one' ? state.currentId : assets[(assets.findIndex(s=>s.id===state.currentId)+1)%assets.length].id); if(state.currentId) playSong(state.currentId,true); save();};
+    audio.onplay=()=>{state.isPlaying=true; renderPlayer(); save()}; audio.onpause=()=>{state.isPlaying=false; renderPlayer(); save()}; audio.onerror=()=>toast('Audio failed to load');
+    document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) return; if(e.code==='Space'){e.preventDefault(); $('#playBtn').click()} if(e.code==='ArrowRight') audio.currentTime=Math.min((audio.currentTime||0)+5,audio.duration||Infinity); if(e.code==='ArrowLeft') audio.currentTime=Math.max((audio.currentTime||0)-5,0); if(e.code==='ArrowUp'){state.volume=Math.min(1,state.volume+.05); $('#volume').value=state.volume; audio.volume=state.volume; save()} if(e.code==='ArrowDown'){state.volume=Math.max(0,state.volume-.05); $('#volume').value=state.volume; audio.volume=state.volume; save()} if(e.key.toLowerCase()==='n') nextSong(); if(e.key.toLowerCase()==='p') prevSong();});
+
+    document.addEventListener('click',e=>{ if(e.target.closest('.absolute.inset-0.bg-black\\/60')) closeDrawer(); });
+    setAccent(state.settings.accent); state.volume = state.settings.defaultVolume ?? state.volume; $('#volume').value=state.volume;
+    if(!audio.src) playSong(state.currentId,false); if(state.settings.autoplay) setTimeout(()=>playSong(state.currentId,true),200);
+    render(); save();
+  </script>
+</body>
+</html>
